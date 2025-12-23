@@ -1,0 +1,7 @@
+#ifndef XCBIMDKIT_EXPORT_H
+#define XCBIMDKIT_EXPORT_H
+
+#define XCBIMDKIT_EXPORT
+#define XCBIMDKIT_DEPRECATED
+
+#endif
