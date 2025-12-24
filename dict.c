@@ -13,8 +13,6 @@ dictlkup(Dictreq *req, Dictres *res)
 	res->nkouho = 0;
 	if(req->key.n == 0)
 		return;
-	res->kouho[0] = req->key;
-	res->nkouho = 1;
 	l = getlang(req->lang);
 	dict = l ? l->dict : nil;
 	if(dict == nil)

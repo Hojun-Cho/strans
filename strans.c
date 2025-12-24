@@ -35,6 +35,8 @@ show(void)
 	Drawcmd dc;
 	int i;
 
+	sclear(&dc.preedit);
+	mapget(im.l->map, &im.line, &dc.preedit);
 	dc.nkouho = im.nkouho;
 	dc.sel = im.sel;
 	for(i = 0; i < dc.nkouho; i++)

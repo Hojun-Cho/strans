@@ -70,10 +70,11 @@ drawkouho(Drawcmd *dc, int first, int n, int w, int h)
 	int sely, y, i;
 	Str *s;
 
-	sely = 2 + (dc->sel - first) * Fontsz;
 	memset(img, (uchar)Colbg, w * h * sizeof(u32int));
+	drawstr(img, 0, 0, dc->preedit.r, dc->preedit.n, w, h);
+	sely = Fontsz + (dc->sel - first) * Fontsz;
 	memset(img + sely * w, (uchar)Colsel, Fontsz * w * sizeof(u32int));
-	for(y = 2, i = 0; i < n; i++, y += Fontsz){
+	for(i = 0, y = Fontsz; i < n; i++, y += Fontsz){
 		s = &dc->kouho[first+i];
 		putfont(img, w, h, 0, y, '1' + i + Asciitofull);
 		drawstr(img, 2*Fontsz, y, s->r, s->n, w, h);
@@ -106,7 +107,7 @@ winshow(Drawcmd *dc)
 	cookie = xcb_query_pointer(conn, scr->root);
 	first = dc->sel >= Maxdisp ? dc->sel - Maxdisp + 1 : 0;
 	n = min(dc->nkouho - first, Maxdisp);
-	maxw = 0;
+	maxw = dc->preedit.n;
 	for(i = 0; i < n; i++)
 		maxw = max(maxw, dc->kouho[first+i].n);
 	ptr = xcb_query_pointer_reply(conn, cookie, nil);
@@ -115,7 +116,7 @@ winshow(Drawcmd *dc)
 	px = ptr->root_x + 10;
 	py = ptr->root_y + 10;
 	free(ptr);
-	vals[3] = h = n * Fontsz + 4;
+	vals[3] = h = (n + 1) * Fontsz;
 	vals[2] = w = (maxw + 3) * Fontsz;
 	vals[1] = py = max(0, min(py, scr->height_in_pixels - h));
 	vals[0] = px = max(0, min(px, scr->width_in_pixels - w));
@@ -136,7 +137,7 @@ drawthread(void*)
 	threadsetname("draw");
 	wininit();
 	while(chanrecv(drawc, &dc) > 0){
-		if(dc.nkouho == 0)
+		if(dc.nkouho == 0 && dc.preedit.n == 0)
 			winhide();
 		else
 			winshow(&dc);

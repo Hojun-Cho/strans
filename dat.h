@@ -94,6 +94,7 @@ struct Im
 typedef struct Drawcmd Drawcmd;
 struct Drawcmd
 {
+	Str	preedit;
 	Str	kouho[Maxkouho];
 	int	nkouho;
 	int	sel;
