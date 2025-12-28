@@ -8,6 +8,7 @@
 | Ctrl+K | Katakana |
 | Ctrl+S | Hangul |
 | Ctrl+T | English |
+| Ctrl+E | Emoji(☺,λ,ε) |
 
 ## Dependencies
 - plan9port
