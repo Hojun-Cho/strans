@@ -79,7 +79,6 @@ struct Lang
 	char	*dictname;
 	Hmap	*map;
 	Hmap	*dict;
-	Emit	(*trans)(Im*, Rune);
 };
 
 struct Im

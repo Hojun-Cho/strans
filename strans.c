@@ -4,9 +4,9 @@
 static Im im;
 
 Lang langs[] = {
-	{LangJP,  "hira",   "kanji",  nil, nil, jptrans},
-	{LangJPK, "kata",   "kanji",  nil, nil, jptrans},
-	{LangKO,  "hangul", nil, nil, nil, trans},
+	{LangJP,  "hira",   "kanji",  nil, nil},
+	{LangJPK, "kata",   "kanji",  nil, nil},
+	{LangKO,  "hangul", nil, nil, nil},
 };
 int nlang = nelem(langs);
 
@@ -89,8 +89,7 @@ dotrans(Rune c, Str *com)
 	Emit e;
 	Dictreq req;
 
-	e = im.l->trans(&im, c);
-
+	e = trans(&im, c);
 	if(e.s.n > 0)
 		sappend(com, &e.s);
 	sclear(&im.pre);
@@ -101,7 +100,6 @@ dotrans(Rune c, Str *com)
 		req.pre = im.pre;
 		channbsend(dictreqc, &req);
 	}
-
 	return e.eat;
 }
 
@@ -133,11 +131,9 @@ trans(Im *im, Rune c)
 		mapget(h, &key, &e.dict);
 		return e;
 	}
-
 	last = slastr(&im->pre);
 	if(last == 0)
 		goto flush;
-
 	key = im->pre;
 	key.n--;
 	if(mapget(h, &key, &kana)){
@@ -156,7 +152,6 @@ trans(Im *im, Rune c)
 
 flush:
 	mapget(h, &im->pre, &e.s);
-
 	sclear(&key);
 	sputr(&key, c);
 	if(hmapget(h, &key) == nil){
@@ -164,7 +159,6 @@ flush:
 		sputr(&e.s, c);
 		return e;
 	}
-
 	e.eat = 1;
 	sputr(&e.next, c);
 	mapget(h, &e.next, &e.dict);

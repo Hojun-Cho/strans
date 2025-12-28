@@ -23,7 +23,6 @@ void	dictthread(void*);
 void	drawthread(void*);
 void	imthread(void*);
 Emit	trans(Im*, Rune);
-Emit	jptrans(Im*, Rune);
 
 void	srvthread(void*);
 
