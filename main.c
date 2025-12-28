@@ -5,7 +5,7 @@ Channel *drawc;
 Channel *keyc;
 Channel *dictreqc;
 Channel *dictresc;
-char *fontpath;
+char *fontdir;
 
 int
 threadmaybackground(void)
@@ -16,7 +16,7 @@ threadmaybackground(void)
 void
 usage(void)
 {
-	fprint(2, "usage: strans mapdir fontpath\n");
+	fprint(2, "usage: strans mapdir fontdir\n");
 	threadexitsall("usage");
 }
 
@@ -60,7 +60,7 @@ threadmain(int argc, char **argv)
 	if(argc != 3)
 		usage();
 
-	fontpath = argv[2];
+	fontdir = argv[2];
 	drawc = chancreate(sizeof(Drawcmd), 0);
 	keyc = chancreate(sizeof(Keyreq), 0);
 	dictreqc = chancreate(sizeof(Dictreq), 4);

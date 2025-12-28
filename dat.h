@@ -17,7 +17,7 @@ enum
 
 	Fontsz	= 32,
 	Fontbase	= 4,
-	Nglyphs	= 65536,
+	Nglyphs	= 0x20000,
 };
 
 enum

@@ -6,7 +6,7 @@ enum {
 	Asciitofull = 0xFEE0,
 };
 
-extern char *fontpath;
+extern char *fontdir;
 
 static xcb_connection_t *conn;
 static xcb_screen_t *scr;
@@ -52,7 +52,7 @@ wininit(void)
 	gc = xcb_generate_id(conn);
 	xcb_create_gc(conn, gc, win, 0, nil);
 	img = emalloc(Imgw * Imgh * sizeof(img[0]));
-	fontinit(fontpath);
+	fontinit(fontdir);
 }
 
 static void
