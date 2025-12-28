@@ -7,6 +7,7 @@ Lang langs[] = {
 	{LangJP,  "hira",   "kanji",  nil, nil},
 	{LangJPK, "kata",   "kanji",  nil, nil},
 	{LangKO,  "hangul", nil, nil, nil},
+	{LangEMOJI, "emoji", "emoji", nil, nil},
 };
 int nlang = nelem(langs);
 
@@ -36,12 +37,23 @@ show(void)
 	int i;
 
 	sclear(&dc.preedit);
-	mapget(im.l->map, &im.pre, &dc.preedit);
+	if(im.l == nil)
+		return;
+	if(!mapget(im.l->map, &im.pre, &dc.preedit))
+		dc.preedit = im.pre;
 	dc.nkouho = im.nkouho;
 	dc.sel = im.sel;
 	for(i = 0; i < dc.nkouho; i++)
 		dc.kouho[i] = im.kouho[i];
 	chansend(drawc, &dc);
+}
+
+static void
+reset(void)
+{
+	sclear(&im.pre);
+	clearkouho();
+	show();
 }
 
 static void
@@ -78,6 +90,10 @@ commit(Str *com)
 {
 	Str kana;
 
+	if(im.l == nil){
+		sclear(&im.pre);
+		return;
+	}
 	if(mapget(im.l->map, &im.pre, &kana))
 		sappend(com, &kana);
 	sclear(&im.pre);
@@ -165,14 +181,6 @@ flush:
 	return e;
 }
 
-static void
-reset(void)
-{
-	sclear(&im.pre);
-	clearkouho();
-	show();
-}
-
 static int
 keystroke(u32int ks, u32int mod, Str *com)
 {
@@ -244,13 +252,14 @@ keystroke(u32int ks, u32int mod, Str *com)
 	}
 	if(im.l == nil)
 		return 0;
-	if(ks > 0x7f || !isalpha(ks)){
+	if(ks > 0x7f || ks == ' '){
 		commit(com);
 		sputr(com, ks);
 		reset();
 		return 1;
 	}
-	return dotrans(ks, com);
+	dotrans(ks, com);
+	return 1;
 }
 
 static void

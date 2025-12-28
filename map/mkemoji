@@ -1,0 +1,39 @@
+#!/bin/sh
+
+awk '
+BEGIN { FS = "\t" }
+/^$/ { next }
+{
+	key = $1
+	val = $2
+	map[key] = val
+	for(i = 1; i < length(key); i++){
+		p = substr(key, 1, i)
+		if(!(p in map))
+			map[p] = p
+	}
+}
+END {
+	for(k in map)
+		print k "\t" map[k]
+}
+' $1 | sort -k1,1 > emoji.map
+
+awk '
+BEGIN { FS = "\t" }
+/^$/ { next }
+{
+	key = $1
+	val = $2
+	for(i = 1; i <= length(key); i++){
+		p = substr(key, 1, i)
+		dict[p] = dict[p] " " val
+	}
+}
+END {
+	for(p in dict){
+		sub(/^ /, "", dict[p])
+		print p "\t" dict[p]
+	}
+}
+' $1 | sort -k1,1 > emoji.dict
