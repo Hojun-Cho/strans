@@ -6,7 +6,7 @@ static Im im;
 Lang langs[] = {
 	{LangJP,  "hira",   "kanji",  nil, nil, jptrans},
 	{LangJPK, "kata",   "kanji",  nil, nil, jptrans},
-	{LangKO,  "hangul", "hangul", nil, nil, trans},
+	{LangKO,  "hangul", nil, nil, nil, trans},
 };
 int nlang = nelem(langs);
 
