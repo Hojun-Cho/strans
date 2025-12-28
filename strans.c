@@ -4,6 +4,7 @@
 static Im im;
 
 Lang langs[] = {
+	{LangEN,  "english", nil, nil, nil},
 	{LangJP,  "hira",   "kanji",  nil, nil},
 	{LangJPK, "kata",   "kanji",  nil, nil},
 	{LangKO,  "hangul", nil, nil, nil},
@@ -37,8 +38,6 @@ show(void)
 	int i;
 
 	sclear(&dc.preedit);
-	if(im.l == nil)
-		return;
 	if(!mapget(im.l->map, &im.pre, &dc.preedit))
 		dc.preedit = im.pre;
 	dc.nkouho = im.nkouho;
@@ -79,7 +78,7 @@ checklang(int c)
 	Lang *l;
 
 	l = getlang(c);
-	if(l == nil && c != LangEN)
+	if(l == nil)
 		return 0;
 	im.l = l;
 	return 1;
@@ -90,10 +89,6 @@ commit(Str *com)
 {
 	Str kana;
 
-	if(im.l == nil){
-		sclear(&im.pre);
-		return;
-	}
 	if(mapget(im.l->map, &im.pre, &kana))
 		sappend(com, &kana);
 	sclear(&im.pre);
@@ -250,8 +245,6 @@ keystroke(u32int ks, u32int mod, Str *com)
 			return 1;
 		return 0;
 	}
-	if(im.l == nil)
-		return 0;
 	if(ks > 0x7f || ks == ' '){
 		commit(com);
 		sputr(com, ks);
@@ -266,6 +259,7 @@ static void
 init(void)
 {
 	memset(&im, 0, sizeof(im));
+	im.l = getlang(LangEN);
 }
 
 void
