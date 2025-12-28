@@ -47,7 +47,7 @@ dictthread(void*)
 		while(channbrecv(dictreqc, &req) > 0)
 			;
 		dictlkup(&req, &res);
-		res.key = req.line;
+		res.key = req.pre;
 		chansend(dictresc, &res);
 	}
 }

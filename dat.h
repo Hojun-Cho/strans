@@ -85,7 +85,7 @@ struct Lang
 struct Im
 {
 	Lang	*l;
-	Str	line;
+	Str	pre;
 	Str	kouho[Maxkouho];
 	int	nkouho;
 	int	sel;
@@ -112,7 +112,7 @@ typedef struct Dictreq Dictreq;
 struct Dictreq
 {
 	Str	key;
-	Str	line;
+	Str	pre;
 	int	lang;
 };
 

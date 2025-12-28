@@ -36,7 +36,7 @@ show(void)
 	int i;
 
 	sclear(&dc.preedit);
-	mapget(im.l->map, &im.line, &dc.preedit);
+	mapget(im.l->map, &im.pre, &dc.preedit);
 	dc.nkouho = im.nkouho;
 	dc.sel = im.sel;
 	for(i = 0; i < dc.nkouho; i++)
@@ -50,14 +50,14 @@ dictq(void)
 	Str dict;
 	Dictreq req;
 
-	if(!mapget(im.l->map, &im.line, &dict)){
+	if(!mapget(im.l->map, &im.pre, &dict)){
 		clearkouho();
 		show();
 		return;
 	}
 	req.key = dict;
 	req.lang = im.l->lang;
-	req.line = im.line;
+	req.pre = im.pre;
 	channbsend(dictreqc, &req);
 }
 
@@ -78,9 +78,9 @@ commit(Str *com)
 {
 	Str kana;
 
-	if(mapget(im.l->map, &im.line, &kana))
+	if(mapget(im.l->map, &im.pre, &kana))
 		sappend(com, &kana);
-	sclear(&im.line);
+	sclear(&im.pre);
 }
 
 static int
@@ -93,12 +93,12 @@ dotrans(Rune c, Str *com)
 
 	if(e.s.n > 0)
 		sappend(com, &e.s);
-	sclear(&im.line);
-	sappend(&im.line, &e.next);
+	sclear(&im.pre);
+	sappend(&im.pre, &e.next);
 	if(e.eat && e.dict.n > 0){
 		req.key = e.dict;
 		req.lang = im.l->lang;
-		req.line = im.line;
+		req.pre = im.pre;
 		channbsend(dictreqc, &req);
 	}
 
@@ -125,7 +125,7 @@ trans(Im *im, Rune c)
 	Rune last;
 
 	h = im->l->map;
-	key = im->line;
+	key = im->pre;
 	sputr(&key, c);
 	if(hmapget(h, &key)){
 		e.eat = 1;
@@ -134,11 +134,11 @@ trans(Im *im, Rune c)
 		return e;
 	}
 
-	last = slastr(&im->line);
+	last = slastr(&im->pre);
 	if(last == 0)
 		goto flush;
 
-	key = im->line;
+	key = im->pre;
 	key.n--;
 	if(mapget(h, &key, &kana)){
 		sclear(&key);
@@ -155,7 +155,7 @@ trans(Im *im, Rune c)
 	}
 
 flush:
-	mapget(h, &im->line, &e.s);
+	mapget(h, &im->pre, &e.s);
 
 	sclear(&key);
 	sputr(&key, c);
@@ -174,7 +174,7 @@ flush:
 static void
 reset(void)
 {
-	sclear(&im.line);
+	sclear(&im.pre);
 	clearkouho();
 	show();
 }
@@ -211,7 +211,7 @@ keystroke(u32int ks, u32int mod, Str *com)
 			reset();
 			return 1;
 		}
-		if(im.line.n > 0){
+		if(im.pre.n > 0){
 			commit(com);
 			reset();
 			return 1;
@@ -219,10 +219,10 @@ keystroke(u32int ks, u32int mod, Str *com)
 		return 0;
 	}
 	if(ks == Kback){
-		if(im.line.n == 0)
+		if(im.pre.n == 0)
 			return 0;
-		spopr(&im.line);
-		if(im.line.n == 0){
+		spopr(&im.pre);
+		if(im.pre.n == 0){
 			reset();
 			return 1;
 		}
@@ -230,7 +230,7 @@ keystroke(u32int ks, u32int mod, Str *com)
 		return 1;
 	}
 	if(ks == Kesc){
-		if(im.line.n == 0)
+		if(im.pre.n == 0)
 			return 0;
 		reset();
 		return 1;
@@ -297,7 +297,7 @@ imthread(void*)
 			write(kr.fd, out, n);
 			break;
 		case 1:
-			if(scmp(&res.key, &im.line) == 0){
+			if(scmp(&res.key, &im.pre) == 0){
 				setkouho(&res);
 				show();
 			}

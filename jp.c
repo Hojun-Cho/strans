@@ -13,7 +13,7 @@ jptrans(Im *im, Rune c)
 	memset(&e, 0, sizeof(e));
 	h = im->l->map;
 	hira = (im->l->lang == LangJP);
-	key = im->line;
+	key = im->pre;
 	sputr(&key, c);
 	if(hmapget(h, &key)){
 		e.eat = 1;
@@ -21,10 +21,10 @@ jptrans(Im *im, Rune c)
 		mapget(h, &key, &e.dict);
 		return e;
 	}
-	last = slastr(&im->line);
+	last = slastr(&im->pre);
 	if(last == 0)
 		goto flush;
-	key = im->line;
+	key = im->pre;
 	key.n--;
 	if(mapget(h, &key, &kana)){
 		sclear(&key);
@@ -40,7 +40,7 @@ jptrans(Im *im, Rune c)
 		}
 	}
 	if(c == 'n' && last == 'n'){
-		key = im->line;
+		key = im->pre;
 		key.n--;
 		if(mapget(h, &key, &kana)){
 			e.eat = 1;
@@ -52,7 +52,7 @@ jptrans(Im *im, Rune c)
 		}
 	}
 	if(c == last && strchr("kgsztdbpmjfchryw", c)){
-		key = im->line;
+		key = im->pre;
 		key.n--;
 		if(mapget(h, &key, &kana)){
 			e.eat = 1;
@@ -65,7 +65,7 @@ jptrans(Im *im, Rune c)
 	}
 
 flush:
-	mapget(h, &im->line, &e.s);
+	mapget(h, &im->pre, &e.s);
 	sclear(&key);
 	sputr(&key, c);
 	if(hmapget(h, &key) == nil){
