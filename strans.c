@@ -91,6 +91,8 @@ commit(Str *com)
 
 	if(mapget(im.l->map, &im.pre, &kana))
 		sappend(com, &kana);
+	else
+		sappend(com, &im.pre);
 	sclear(&im.pre);
 }
 
@@ -162,7 +164,8 @@ trans(Im *im, Rune c)
 	}
 
 flush:
-	mapget(h, &im->pre, &e.s);
+	if(!mapget(h, &im->pre, &e.s))
+		e.s = im->pre;
 	sclear(&key);
 	sputr(&key, c);
 	if(hmapget(h, &key) == nil){
@@ -252,6 +255,7 @@ keystroke(u32int ks, u32int mod, Str *com)
 		return 1;
 	}
 	dotrans(ks, com);
+	show();
 	return 1;
 }
 
