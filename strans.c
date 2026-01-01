@@ -9,6 +9,7 @@ Lang langs[] = {
 	{LangJPK, "kata",   "kanji",  nil, nil},
 	{LangKO,  "hangul", nil, nil, nil},
 	{LangEMOJI, "emoji", "emoji", nil, nil},
+	{LangVI, "telex", nil, nil, nil},
 };
 int nlang = nelem(langs);
 

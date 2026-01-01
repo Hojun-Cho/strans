@@ -14,6 +14,7 @@ enum
 	LangJPK	= 0x0b,
 	LangKO	= 0x13,
 	LangEMOJI	= 0x05,
+	LangVI	= 0x16,
 
 	Fontsz	= 32,
 	Fontbase	= 4,
