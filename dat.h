@@ -58,8 +58,8 @@ struct Hnode
 	int	next;
 	char	*key;
 	int	klen;
-	char	*kana;
-	int	kanalen;
+	char	*val;
+	int	vlen;
 };
 
 typedef struct Hmap Hmap;

@@ -2,7 +2,7 @@
 #include "fn.h"
 
 static void
-dictlkup(Dictreq *req, Dictres *res)
+dictlookup(Dictreq *req, Dictres *res)
 {
 	Lang *l;
 	Hmap *dict;
@@ -18,10 +18,10 @@ dictlkup(Dictreq *req, Dictres *res)
 	if(dict == nil)
 		return;
 	n = hmapget(dict, &req->key);
-	if(n == nil || n->kanalen == 0)
+	if(n == nil || n->vlen == 0)
 		return;
-	p = n->kana;
-	e = p + n->kanalen;
+	p = n->val;
+	e = p + n->vlen;
 	while(res->nkouho < Maxkouho && p < e){
 		sp = p;
 		while(p < e && *p != ' ')
@@ -46,14 +46,14 @@ dictthread(void*)
 			break;
 		while(channbrecv(dictreqc, &req) > 0)
 			;
-		dictlkup(&req, &res);
+		dictlookup(&req, &res);
 		res.key = req.pre;
 		chansend(dictresc, &res);
 	}
 }
 
 static Hmap*
-opendict(char *path)
+dictopen(char *path)
 {
 	Hmap *h;
 	Biobuf *b;
@@ -96,7 +96,7 @@ dictinit(char *dir)
 		if(langs[i].dictname == nil)
 			continue;
 		snprint(path, sizeof(path), "%s/%s.dict", dir, langs[i].dictname);
-		langs[i].dict = opendict(path);
+		langs[i].dict = dictopen(path);
 	}
 }
 

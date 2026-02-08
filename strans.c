@@ -316,9 +316,9 @@ mapget(Hmap *h, Str *key, Str *out)
 	if(key->n == 0)
 		return 0;
 	n = hmapget(h, key);
-	if(n == nil || n->kanalen == 0)
+	if(n == nil || n->vlen == 0)
 		return 0;
-	sinit(out, n->kana, n->kanalen);
+	sinit(out, n->val, n->vlen);
 	return 1;
 }
 

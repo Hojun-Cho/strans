@@ -65,7 +65,7 @@ hmapget(Hmap *h, Str *key)
 }
 
 static char*
-str2dup(Str *s)
+sdup(Str *s)
 {
 	char buf[256];
 	char *p;
@@ -79,7 +79,7 @@ str2dup(Str *s)
 }
 
 int
-hmapset(Hmap **store, Str *key, Str *kana)
+hmapset(Hmap **store, Str *key, Str *val)
 {
 	Hnode *n;
 	uchar *v;
@@ -116,14 +116,14 @@ hmapset(Hmap **store, Str *key, Str *kana)
 	n = (Hnode*)v;
 replace:
 	if(n->filled == 0){
-		n->key = str2dup(key);
+		n->key = sdup(key);
 		n->klen = strlen(n->key);
 		n->filled = 1;
 	}
 	n->next = next;
-	if(kana->n > 0){
-		n->kana = str2dup(kana);
-		n->kanalen = strlen(n->kana);
+	if(val->n > 0){
+		n->val = sdup(val);
+		n->vlen = strlen(n->val);
 	}
 	return 0;
 }
