@@ -24,7 +24,7 @@ static void
 clearkouho(void)
 {
 	im.nkouho = 0;
-	im.sel = 0;
+	im.sel = -1;
 }
 
 static void
@@ -200,7 +200,7 @@ keystroke(u32int ks, u32int mod, Str *com)
 			return 0;
 		if(ks == Kdown && im.sel < im.nkouho - 1)
 			im.sel++;
-		if(ks == Kup && im.sel > 0)
+		if(ks == Kup && im.sel >= 0)
 			im.sel--;
 		show();
 		return 1;
@@ -256,6 +256,11 @@ keystroke(u32int ks, u32int mod, Str *com)
 		if(setlang(ks))
 			return 1;
 		return 0;
+	}
+	if(ks == '0' && im.nkouho > 0){
+		commit(com);
+		reset();
+		return 1;
 	}
 	if(ks > 0x7f || ks == ' '){
 		commit(com);

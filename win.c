@@ -72,8 +72,10 @@ drawkouho(Drawcmd *dc, int first, int n, int w, int h)
 
 	memset(img, (uchar)Colbg, w * h * sizeof(u32int));
 	drawstr(img, 0, 0, dc->pre.r, dc->pre.n, w, h);
-	sely = Fontsz + (dc->sel - first) * Fontsz;
-	memset(img + sely * w, (uchar)Colsel, Fontsz * w * sizeof(u32int));
+	if(dc->sel >= 0){
+		sely = Fontsz + (dc->sel - first) * Fontsz;
+		memset(img + sely * w, (uchar)Colsel, Fontsz * w * sizeof(u32int));
+	}
 	for(i = 0, y = Fontsz; i < n; i++, y += Fontsz){
 		s = &dc->kouho[first+i];
 		putfont(img, w, h, 0, y, '1' + i + Asciitofull);
