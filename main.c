@@ -61,7 +61,7 @@ threadmain(int argc, char **argv)
 		usage();
 
 	fontdir = argv[2];
-	drawc = chancreate(sizeof(Drawcmd), 0);
+	drawc = chancreate(sizeof(Drawcmd), 4);
 	keyc = chancreate(sizeof(Keyreq), 0);
 	dictreqc = chancreate(sizeof(Dictreq), 4);
 	dictresc = chancreate(sizeof(Dictres), 0);

@@ -117,7 +117,7 @@ typedef struct Drawcmd Drawcmd;
 struct Drawcmd
 {
 	Str	pre;
-	Str	kouho[Maxkouho];
+	Str	kouho[Maxdisp];
 	int	nkouho;
 	int	sel;
 };

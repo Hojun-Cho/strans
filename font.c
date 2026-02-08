@@ -99,7 +99,8 @@ void
 putfont(u32int *buf, int w, int h, int px, int py, Rune r)
 {
 	Glyph *g;
-	int i, j, x, y, a, sel, f;
+	int i, j, a, sel, f;
+	int y0, j0, j1, x0, i0, i1;
 	u32int *p;
 
 	if(r >= Nglyphs)
@@ -116,17 +117,18 @@ putfont(u32int *buf, int w, int h, int px, int py, Rune r)
 		if(g->bmp == nil)
 			return;
 	}
-	for(j = 0; j < g->h; j++){
-		y = py + j + g->oy + Fontsz - Fontbase;
-		if(y < 0 || y >= h)
-			continue;
-		for(i = 0; i < g->w; i++){
-			x = px + i + g->ox;
-			if(x < 0 || x >= w)
-				continue;
+
+	y0 = py + g->oy + Fontsz - Fontbase;
+	j0 = y0 < 0 ? -y0 : 0;
+	j1 = y0 + g->h > h ? h - y0 : g->h;
+	x0 = px + g->ox;
+	i0 = x0 < 0 ? -x0 : 0;
+	i1 = x0 + g->w > w ? w - x0 : g->w;
+	for(j = j0; j < j1; j++){
+		for(i = i0; i < i1; i++){
 			a = g->bmp[j * g->w + i];
 			if(a > 0){
-				p = &buf[y * w + x];
+				p = &buf[(y0 + j) * w + x0 + i];
 				sel = (*p == Colsel) ? 1 : 0;
 				*p = blendtab[sel][a];
 			}

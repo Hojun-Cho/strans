@@ -43,15 +43,18 @@ static void
 show(void)
 {
 	Drawcmd dc;
-	int i;
+	int i, first, n;
 
 	sclear(&dc.pre);
 	if(!mapget(im.l->map, &im.pre, &dc.pre))
 		dc.pre = im.pre;
-	dc.nkouho = im.nkouho;
-	dc.sel = im.sel;
-	for(i = 0; i < dc.nkouho; i++)
-		dc.kouho[i] = im.kouho[i];
+	first = im.sel >= Maxdisp ? im.sel - Maxdisp + 1 : 0;
+	n = im.nkouho - first;
+	if(n > Maxdisp) n = Maxdisp;
+	dc.nkouho = n;
+	dc.sel = im.sel >= 0 ? im.sel - first : -1;
+	for(i = 0; i < n; i++)
+		dc.kouho[i] = im.kouho[first + i];
 	chansend(drawc, &dc);
 }
 

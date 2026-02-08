@@ -73,7 +73,7 @@ drawkouho(Drawcmd *dc, int first, int n, int w, int h)
 	memset(img, (uchar)Colbg, w * h * sizeof(u32int));
 	drawstr(img, 0, 0, dc->pre.r, dc->pre.n, w, h);
 	if(dc->sel >= 0){
-		sely = Fontsz + (dc->sel - first) * Fontsz;
+		sely = Fontsz + dc->sel * Fontsz;
 		memset(img + sely * w, (uchar)Colsel, Fontsz * w * sizeof(u32int));
 	}
 	for(i = 0, y = Fontsz; i < n; i++, y += Fontsz){
@@ -101,17 +101,16 @@ winhide(void)
 static void
 winshow(Drawcmd *dc)
 {
-	int px, py, w, h, i, n, first, maxw;
+	int px, py, w, h, i, n, maxw;
 	u32int vals[4];
 	xcb_query_pointer_reply_t *ptr;
 	xcb_query_pointer_cookie_t cookie;
 
 	cookie = xcb_query_pointer(conn, scr->root);
-	first = dc->sel >= Maxdisp ? dc->sel - Maxdisp + 1 : 0;
-	n = min(dc->nkouho - first, Maxdisp);
+	n = dc->nkouho;
 	maxw = dc->pre.n;
 	for(i = 0; i < n; i++)
-		maxw = max(maxw, dc->kouho[first+i].n);
+		maxw = max(maxw, dc->kouho[i].n);
 	ptr = xcb_query_pointer_reply(conn, cookie, nil);
 	if(ptr == nil)
 		die("xcb_query_pointer");
@@ -127,7 +126,7 @@ winshow(Drawcmd *dc)
 		XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
 		vals);
 	xcb_map_window(conn, win);
-	drawkouho(dc, first, n, w, h);
+	drawkouho(dc, 0, n, w, h);
 	putimage(w, h);
 }
 
@@ -139,6 +138,8 @@ drawthread(void*)
 	threadsetname("draw");
 	wininit();
 	while(chanrecv(drawc, &dc) > 0){
+		while(channbrecv(drawc, &dc) > 0)
+			;
 		if(dc.nkouho == 0 && dc.pre.n == 0)
 			winhide();
 		else
