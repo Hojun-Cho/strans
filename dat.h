@@ -97,6 +97,9 @@ struct Lang
 	int	lang;
 	char	*mapname;
 	char	*dictname;
+	Emit	(*trans)(Im*, Rune);
+	void	(*back)(Im*);
+	void	(*dictq)(Im*);
 	Trie	*map;
 	Hmap	*dict;
 };
@@ -113,7 +116,7 @@ struct Im
 typedef struct Drawcmd Drawcmd;
 struct Drawcmd
 {
-	Str	preedit;
+	Str	pre;
 	Str	kouho[Maxkouho];
 	int	nkouho;
 	int	sel;

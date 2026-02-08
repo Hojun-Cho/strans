@@ -71,7 +71,7 @@ drawkouho(Drawcmd *dc, int first, int n, int w, int h)
 	Str *s;
 
 	memset(img, (uchar)Colbg, w * h * sizeof(u32int));
-	drawstr(img, 0, 0, dc->preedit.r, dc->preedit.n, w, h);
+	drawstr(img, 0, 0, dc->pre.r, dc->pre.n, w, h);
 	sely = Fontsz + (dc->sel - first) * Fontsz;
 	memset(img + sely * w, (uchar)Colsel, Fontsz * w * sizeof(u32int));
 	for(i = 0, y = Fontsz; i < n; i++, y += Fontsz){
@@ -107,7 +107,7 @@ winshow(Drawcmd *dc)
 	cookie = xcb_query_pointer(conn, scr->root);
 	first = dc->sel >= Maxdisp ? dc->sel - Maxdisp + 1 : 0;
 	n = min(dc->nkouho - first, Maxdisp);
-	maxw = dc->preedit.n;
+	maxw = dc->pre.n;
 	for(i = 0; i < n; i++)
 		maxw = max(maxw, dc->kouho[first+i].n);
 	ptr = xcb_query_pointer_reply(conn, cookie, nil);
@@ -137,7 +137,7 @@ drawthread(void*)
 	threadsetname("draw");
 	wininit();
 	while(chanrecv(drawc, &dc) > 0){
-		if(dc.nkouho == 0 && dc.preedit.n == 0)
+		if(dc.nkouho == 0 && dc.pre.n == 0)
 			winhide();
 		else
 			winshow(&dc);

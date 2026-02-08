@@ -2,14 +2,21 @@
 #include "fn.h"
 
 static Im im;
+static void dictqmap(Im*);
+
+static void
+backmap(Im *im)
+{
+	spopr(&im->pre);
+}
 
 Lang langs[] = {
-	{LangEN,  "english", nil, nil, nil},
-	{LangJP,  "hira",   "kanji",  nil, nil},
-	{LangJPK, "kata",   "kanji",  nil, nil},
-	{LangKO,  "hangul", nil, nil, nil},
-	{LangEMOJI, "emoji", "emoji", nil, nil},
-	{LangVI, "telex", nil, nil, nil},
+	{LangEN,    "english", nil,      transmap, backmap, dictqmap, nil, nil},
+	{LangJP,    "hira",    "kanji",  transmap, backmap, dictqmap, nil, nil},
+	{LangJPK,   "kata",    "kanji",  transmap, backmap, dictqmap, nil, nil},
+	{LangKO,    "hangul",  nil,      transko,  backko,  dictqmap, nil, nil},
+	{LangEMOJI, "emoji",   "emoji",  transmap, backmap, dictqmap, nil, nil},
+	{LangVI,    "telex",   nil,      transmap, backmap, dictqmap, nil, nil},
 };
 int nlang = nelem(langs);
 
@@ -38,9 +45,9 @@ show(void)
 	Drawcmd dc;
 	int i;
 
-	sclear(&dc.preedit);
-	if(!mapget(im.l->map, &im.pre, &dc.preedit))
-		dc.preedit = im.pre;
+	sclear(&dc.pre);
+	if(!mapget(im.l->map, &im.pre, &dc.pre))
+		dc.pre = im.pre;
 	dc.nkouho = im.nkouho;
 	dc.sel = im.sel;
 	for(i = 0; i < dc.nkouho; i++)
@@ -56,25 +63,32 @@ reset(void)
 	show();
 }
 
-static void
-dictq(void)
+void
+dictsend(Im *im, Str *key)
 {
-	Str dict;
 	Dictreq req;
 
-	if(!mapget(im.l->map, &im.pre, &dict)){
+	req.key = *key;
+	req.lang = im->l->lang;
+	req.pre = im->pre;
+	channbsend(dictreqc, &req);
+}
+
+static void
+dictqmap(Im *im)
+{
+	Str dict;
+
+	if(!mapget(im->l->map, &im->pre, &dict)){
 		clearkouho();
 		show();
 		return;
 	}
-	req.key = dict;
-	req.lang = im.l->lang;
-	req.pre = im.pre;
-	channbsend(dictreqc, &req);
+	dictsend(im, &dict);
 }
 
 static int
-checklang(int c)
+setlang(int c)
 {
 	Lang *l;
 
@@ -88,10 +102,10 @@ checklang(int c)
 static void
 commit(Str *com)
 {
-	Str kana;
+	Str val;
 
-	if(mapget(im.l->map, &im.pre, &kana))
-		sappend(com, &kana);
+	if(mapget(im.l->map, &im.pre, &val))
+		sappend(com, &val);
 	else
 		sappend(com, &im.pre);
 	sclear(&im.pre);
@@ -103,7 +117,7 @@ dotrans(Rune c, Str *com)
 	Emit e;
 	Dictreq req;
 
-	e = transmap(&im, c);
+	e = im.l->trans(&im, c);
 	if(e.s.n > 0)
 		sappend(com, &e.s);
 	sclear(&im.pre);
@@ -216,12 +230,12 @@ keystroke(u32int ks, u32int mod, Str *com)
 	if(ks == Kback){
 		if(im.pre.n == 0)
 			return 0;
-		spopr(&im.pre);
+		im.l->back(&im);
 		if(im.pre.n == 0){
 			reset();
 			return 1;
 		}
-		dictq();
+		im.l->dictq(&im);
 		return 1;
 	}
 	if(ks == Kesc){
@@ -239,7 +253,7 @@ keystroke(u32int ks, u32int mod, Str *com)
 		reset();
 		if(ks >= 'a' && ks <= 'z')
 			ks -= 'a' - 1;
-		if(checklang(ks))
+		if(setlang(ks))
 			return 1;
 		return 0;
 	}
