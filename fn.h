@@ -12,7 +12,11 @@ Rune	slastr(Str*);
 Hmap*	hmapalloc(int, int);
 int	hmapset(Hmap**, Str*, Str*);
 Hnode*	hmapget(Hmap*, Str*);
-int	mapget(Hmap*, Str*, Str*);
+int	mapget(Trie*, Str*, Str*);
+
+Trie*	trieopen(char*);
+char*	trieget(Trie*, char*, int, int*);
+int	trielookup(Trie*, char*, int, char**, int*);
 
 Lang*	getlang(int);
 void	mapinit(char*);
@@ -22,7 +26,7 @@ void	dictthread(void*);
 
 void	drawthread(void*);
 void	imthread(void*);
-Emit	trans(Im*, Rune);
+Emit	transmap(Im*, Rune);
 
 void	srvthread(void*);
 

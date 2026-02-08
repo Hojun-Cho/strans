@@ -45,7 +45,6 @@ typedef struct Emit Emit;
 struct Emit
 {
 	int	eat;
-	int	flush;
 	Str	s;
 	Str	next;
 	Str	dict;
@@ -60,6 +59,25 @@ struct Hnode
 	int	klen;
 	char	*val;
 	int	vlen;
+};
+
+typedef struct Tnode Tnode;
+struct Tnode
+{
+	int	child;
+	int	sibling;
+	char	c;
+	char	*val;
+	int	vlen;
+};
+
+typedef struct Trie Trie;
+struct Trie
+{
+	int	root;
+	Tnode	*nodes;
+	int	n;
+	int	cap;
 };
 
 typedef struct Hmap Hmap;
@@ -79,7 +97,7 @@ struct Lang
 	int	lang;
 	char	*mapname;
 	char	*dictname;
-	Hmap	*map;
+	Trie	*map;
 	Hmap	*dict;
 };
 

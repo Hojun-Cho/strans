@@ -103,7 +103,7 @@ dotrans(Rune c, Str *com)
 	Emit e;
 	Dictreq req;
 
-	e = trans(&im, c);
+	e = transmap(&im, c);
 	if(e.s.n > 0)
 		sappend(com, &e.s);
 	sclear(&im.pre);
@@ -128,55 +128,49 @@ getlang(int lang)
 	return nil;
 }
 
+static int
+maplookup(Trie *t, Str *key, Str *out)
+{
+	char buf[256], *v;
+	int klen, vlen;
+
+	if(key->n == 0)
+		return 0;
+	v = nil;
+	vlen = 0;
+	klen = stoutf(key, buf, sizeof(buf));
+	if(!trielookup(t, buf, klen, &v, &vlen))
+		return 0;
+	if(out != nil && v != nil)
+		sinit(out, v, vlen);
+	return 1;
+}
+
 Emit
-trans(Im *im, Rune c)
+transmap(Im *im, Rune c)
 {
 	Emit e = {0};
-	Str key, kana;
-	Hmap *h;
-	Rune last;
+	Str key;
+	Trie *t;
 
-	h = im->l->map;
+	t = im->l->map;
 	key = im->pre;
 	sputr(&key, c);
-	if(hmapget(h, &key)){
+	if(maplookup(t, &key, &e.dict)){
 		e.eat = 1;
 		e.next = key;
-		mapget(h, &key, &e.dict);
 		return e;
 	}
-	last = slastr(&im->pre);
-	if(last == 0)
-		goto flush;
-	key = im->pre;
-	key.n--;
-	if(mapget(h, &key, &kana)){
-		sclear(&key);
-		sputr(&key, last);
-		sputr(&key, c);
-		if(hmapget(h, &key)){
-			e.eat = 1;
-			e.s = kana;
-			sputr(&e.next, last);
-			sputr(&e.next, c);
-			mapget(h, &e.next, &e.dict);
-			return e;
-		}
-	}
-
-flush:
-	if(!mapget(h, &im->pre, &e.s))
+	if(!mapget(t, &im->pre, &e.s))
 		e.s = im->pre;
 	sclear(&key);
 	sputr(&key, c);
-	if(hmapget(h, &key) == nil){
-		e.flush = 1;
+	if(!maplookup(t, &key, &e.dict)){
 		sputr(&e.s, c);
 		return e;
 	}
 	e.eat = 1;
 	sputr(&e.next, c);
-	mapget(h, &e.next, &e.dict);
 	return e;
 }
 
@@ -309,55 +303,19 @@ imthread(void*)
 }
 
 int
-mapget(Hmap *h, Str *key, Str *out)
+mapget(Trie *t, Str *key, Str *out)
 {
-	Hnode *n;
+	char buf[256], *v;
+	int klen, vlen;
 
 	if(key->n == 0)
 		return 0;
-	n = hmapget(h, key);
-	if(n == nil || n->vlen == 0)
+	klen = stoutf(key, buf, sizeof(buf));
+	v = trieget(t, buf, klen, &vlen);
+	if(v == nil)
 		return 0;
-	sinit(out, n->val, n->vlen);
+	sinit(out, v, vlen);
 	return 1;
-}
-
-static Hmap*
-openmap(char *path)
-{
-	Hmap *h;
-	Biobuf *b;
-	Str key, val, empty;
-	char *line, *tab;
-	int i, klen;
-
-	b = Bopen(path, OREAD);
-	if(b == nil)
-		die("can't open: %s", path);
-	h = hmapalloc(1024, 0);
-	sclear(&empty);
-	while((line = Brdstr(b, '\n', 1)) != nil){
-		if(line[0] == '\0'){
-			free(line);
-			continue;
-		}
-		tab = strchr(line, '\t');
-		if(tab == nil || tab[1] == '\0')
-			die("malformed map: %s", path);
-		*tab = '\0';
-		klen = strlen(line);
-		sinit(&key, line, klen);
-		sinit(&val, tab+1, strlen(tab+1));
-		hmapset(&h, &key, &val);
-		for(i = 1; i < klen; i++){
-			sinit(&key, line, i);
-			if(hmapget(h, &key) == nil)
-				hmapset(&h, &key, &empty);
-		}
-		free(line);
-	}
-	Bterm(b);
-	return h;
 }
 
 void
@@ -370,7 +328,7 @@ mapinit(char *dir)
 		if(langs[i].mapname == nil)
 			continue;
 		snprint(path, sizeof(path), "%s/%s.map", dir, langs[i].mapname);
-		langs[i].map = openmap(path);
+		langs[i].map = trieopen(path);
 	}
 }
 
