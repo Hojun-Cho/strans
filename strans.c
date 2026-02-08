@@ -16,7 +16,7 @@ Lang langs[] = {
 	{LangJPK,   "kata",    "kanji",  transmap, backmap, dictqmap, nil, nil},
 	{LangKO,    "hangul",  nil,      transko,  backko,  dictqmap, nil, nil},
 	{LangEMOJI, "emoji",   "emoji",  transmap, backmap, dictqmap, nil, nil},
-	{LangVI,    "telex",   nil,      transmap, backmap, dictqmap, nil, nil},
+	{LangVI,    "telex",   nil,      transvi,  backmap, dictqmap, nil, nil},
 };
 int nlang = nelem(langs);
 

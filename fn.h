@@ -28,6 +28,7 @@ void	drawthread(void*);
 void	imthread(void*);
 Emit	transmap(Im*, Rune);
 Emit	transko(Im*, Rune);
+Emit	transvi(Im*, Rune);
 void	backko(Im*);
 void	dictsend(Im*, Str*);
 
