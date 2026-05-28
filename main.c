@@ -69,6 +69,7 @@ threadmain(int argc, char **argv)
 	dictinit(argv[1]);
 	proccreate(drawthread, nil, 16384);
 	proccreate(srvthread, nil, 16384);
+	proccreate(ibusthread, nil, 32768);
 	threadcreate(dictthread, nil, 16384);
 	threadcreate(imthread, nil, 16384);
 

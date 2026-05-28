@@ -7,6 +7,7 @@ Inspired by 9front's ktrans. Threads communicate via CSP channels.
 ## Dependencies
 
 - plan9port
+- dbus-1
 - gtk+-3.0 (optional, for GTK IM module)
 
 ## Build
@@ -27,6 +28,12 @@ For XIM apps:
 For GTK apps:
 
 	GTK_IM_MODULE=strans gedit
+
+For IBus apps (kitty, foot, etc.):
+
+	GLFW_IM_MODULE=ibus kitty
+
+Strans itself is the IBus endpoint; no ibus-daemon or fcitx5 needed.
 
 ## Usage
 
@@ -50,6 +57,7 @@ Four threads communicate via CSP channels:
 - [dictthread](dict.c#L38): dictionary lookup
 - [drawthread](win.c#L133): preedit window rendering
 - [srvthread](srv.c#L42): IPC via unix socket
+- [ibusthread](ibus.c): IBus D-Bus endpoint for GLFW/kitty
 
 Adapters (strans-xim, im-strans.so) bridge X11/GTK events.
 

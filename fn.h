@@ -33,6 +33,7 @@ void	backko(Im*);
 void	dictsend(Im*, Str*);
 
 void	srvthread(void*);
+void	ibusthread(void*);
 
 void*	emalloc(ulong);
 void*	erealloc(void*, ulong);
