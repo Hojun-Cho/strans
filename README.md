@@ -1,3 +1,6 @@
+# !! WARRNING !!
+This repository has been moved to [https://git.kamuix.xyz/Hojun-Cho/strans](https://git.kamuix.xyz/Hojun-Cho/strans).
+
 # strans
 
 An input method daemon for CJK text entry on X11.
